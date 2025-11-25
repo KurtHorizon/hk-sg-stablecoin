@@ -12,8 +12,6 @@
 /contracts/lib/*/
 /contracts/lib/openzeppelin-contracts/.git/
 
-# 如果你使用 forge install，则直接忽略所有 lib
-# 若你想 commit 你自己写的库，可以把上面改成具体路径
 
 # --- Node / Next.js frontend ---
 /frontend/node_modules/
@@ -37,3 +35,45 @@
 # --- Misc ---
 *.tmp
 *.swp
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+frontend/node_modules
+frontend/.pnp
+frontend/.pnp.*
+frontend/.yarn/*
+!frontend/.yarn/patches
+!frontend/.yarn/plugins
+!frontend/.yarn/releases
+!frontend/.yarn/versions
+
+# testing
+frontend/coverage
+
+# next.js
+frontend/.next/
+frontend/out/
+
+# production
+frontend/build
+
+# misc
+frontend/.DS_Store
+frontend/*.pem
+
+# debug
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+frontend/.env*
+
+# vercel
+frontend/.vercel
+
+# typescript
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
