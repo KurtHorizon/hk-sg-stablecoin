@@ -1,5 +1,8 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # --- macOS ---
 .DS_Store
+frontend/.DS_Store
 
 # --- VSCode ---
 .vscode/
@@ -12,34 +15,10 @@
 /contracts/lib/*/
 /contracts/lib/openzeppelin-contracts/.git/
 
-
 # --- Node / Next.js frontend ---
-/frontend/node_modules/
-/frontend/.next/
-/frontend/.turbo/
-/frontend/out/
-/frontend/package-lock.json
-/frontend/npm-debug.log
-/frontend/yarn-debug.log
-/frontend/yarn-error.log
-
-# --- ENV files ---
-/frontend/.env
-/frontend/.env.local
-/frontend/.env.production
-/frontend/.env.development
-
-# --- Logs ---
-*.log
-
-# --- Misc ---
-*.tmp
-*.swp
-
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 frontend/node_modules
+frontend/node_modules/
 frontend/.pnp
 frontend/.pnp.*
 frontend/.yarn/*
@@ -58,22 +37,37 @@ frontend/out/
 # production
 frontend/build
 
-# misc
-frontend/.DS_Store
-frontend/*.pem
+# turbo
+frontend/.turbo/
 
-# debug
+# package logs/locks
+frontend/package-lock.json
+frontend/npm-debug.log
 frontend/npm-debug.log*
+frontend/yarn-debug.log
 frontend/yarn-debug.log*
+frontend/yarn-error.log
 frontend/yarn-error.log*
 frontend/.pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# --- ENV files ---
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+frontend/.env.development
 frontend/.env*
 
-# vercel
+# --- vercel ---
 frontend/.vercel
 
-# typescript
+# --- typescript ---
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
+
+# --- Logs ---
+*.log
+
+# --- Misc ---
+*.tmp
+*.swp
+frontend/*.pem
