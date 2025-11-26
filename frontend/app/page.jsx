@@ -25,6 +25,11 @@ export default function Home() {
     return () => clearInterval(id);
   }, []);
 
+  // ---- New: Pay (transfer) states ----
+  const [payToken, setPayToken] = useState("HKDC");
+  const [payTo, setPayTo] = useState("");
+  const [payAmt, setPayAmt] = useState("");
+
   // Contract instances
   const hkdc = useMemo(
     () => provider && new ethers.Contract(ADDR.HKDC, ABI.ERC20, provider),
@@ -100,6 +105,37 @@ export default function Home() {
     alert("Swap completed. Tx: " + rc.hash);
   };
 
+  // ---- New: send payment (ERC20 transfer) ----
+  const doPay = async () => {
+    if (!signer) return;
+
+    if (!kycVerified) {
+      alert("Please complete KYC before sending.");
+      return;
+    }
+    if (!ethers.isAddress(payTo)) {
+      alert("Invalid recipient address.");
+      return;
+    }
+    const amount = ethers.parseUnits(payAmt || "0", 6);
+    if (amount <= 0n) {
+      alert("Amount must be greater than 0.");
+      return;
+    }
+
+    const tokenAddr = payToken === "HKDC" ? ADDR.HKDC : ADDR.SGDC;
+    const erc = new ethers.Contract(tokenAddr, ABI.ERC20, signer);
+
+    const tx = await erc.transfer(payTo, amount);
+    const rc = await tx.wait();
+
+    await refreshBasics();
+    alert(`${payToken} sent. Tx: ${rc.hash}`);
+    setPayAmt("");
+    // leave payTo for convenience; uncomment to clear:
+    // setPayTo("");
+  };
+
   useEffect(() => {
     if (!provider) return;
     refreshBasics();
@@ -114,6 +150,7 @@ export default function Home() {
             <span className="text-lime-400">SCCS</span> - StableCoin CyberSpace
           </h1>
 
+          {/* Wallet + KYC */}
           <div className="flex items-center gap-3">
             {account ? (
               <div className="rounded-xl border border-lime-400/30 bg-black/40 px-4 py-2 text-sm">
@@ -140,6 +177,56 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ---- New: Pay section (top, under the title) ---- */}
+        <div className="rounded-2xl border border-lime-400/20 bg-black/60 p-4">
+          <div className="mb-3 text-sm text-white/70">Pay</div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Token selector */}
+            <select
+              value={payToken}
+              onChange={(e) => setPayToken(e.target.value)}
+              className="rounded-lg bg-[#0a1118] px-3 py-2 outline-none"
+            >
+              <option value="HKDC">HKDC</option>
+              <option value="SGDC">SGDC</option>
+            </select>
+
+            {/* Recipient */}
+            <input
+              value={payTo}
+              onChange={(e) => setPayTo(e.target.value)}
+              placeholder="Recipient address (0x...)"
+              className="min-w-[280px] flex-1 rounded-lg bg-[#0a1118] px-3 py-2 outline-none"
+            />
+
+            {/* Amount */}
+            <input
+              value={payAmt}
+              onChange={(e) => setPayAmt(e.target.value)}
+              placeholder="Amount (6 decimals)"
+              className="min-w-[200px] rounded-lg bg-[#0a1118] px-3 py-2 outline-none"
+            />
+
+            {/* Send */}
+            <button
+              onClick={doPay}
+              disabled={
+                !account || !kycVerified || !payAmt || !ethers.isAddress(payTo)
+              }
+              className="rounded-xl bg-lime-500/90 px-4 py-2 font-semibold text-black hover:bg-lime-400 disabled:opacity-40"
+            >
+              Send
+            </button>
+          </div>
+
+          <div className="mt-2 text-xs text-white/50">
+            The transaction will be rejected if either party has not completed
+            identity verification (KYC), or is restricted due to suspicious or
+            illicit activity.
+          </div>
+        </div>
+
         {/* Rate + Static Chart */}
         <div className="grid gap-6 md:grid-cols-3">
           {/* Static image */}
@@ -159,10 +246,9 @@ export default function Home() {
             />
           </div>
 
-          {/* Rate box */}
+          {/* Time + balances */}
           <div className="rounded-2xl border border-lime-400/20 bg-black/60 p-4">
             <div className="text-sm text-white/70">Current Time</div>
-
             <div className="mt-2 text-2xl font-bold text-lime-300">
               {new Date(now).toLocaleString()}
             </div>
