@@ -99,7 +99,7 @@ export default function Home() {
       await tx1.wait();
     }
 
-    const tx2 = await fxw.swapExactIn(tokenIn, tokenOut, amountIn, 0, 600);
+    const tx2 = await fxw.swapExactIn(tokenIn, tokenOut, amountIn, 0, 6000000);
     const rc = await tx2.wait();
 
     await refreshBasics();
@@ -135,6 +135,41 @@ export default function Home() {
     setPayAmt("");
     // leave payTo for convenience; uncomment to clear:
     // setPayTo("");
+  };
+
+  // ===== Developer Deposit (mint) =====
+  // Only works if signer has MINTER_ROLE (Anvil demo uses admin account)
+  const devMint = async (token, amountStr) => {
+    if (!signer) return alert("Connect wallet first.");
+    const amt = ethers.parseUnits(amountStr || "0", 6);
+    if (amt <= 0n) return alert("Amount must be > 0.");
+
+    const tokenAddr = token === "HKDC" ? ADDR.HKDC : ADDR.SGDC;
+    const erc = new ethers.Contract(tokenAddr, ABI.ERC20, signer);
+
+    const tx = await erc.mint(await signer.getAddress(), amt);
+    await tx.wait();
+
+    alert(`Minted ${amountStr} ${token}.`);
+    await refreshBasics();
+  };
+
+  // ===== User Withdraw (burn) =====
+  const userBurn = async (token, amountStr) => {
+    if (!signer) return alert("Connect wallet first.");
+    const amt = ethers.parseUnits(amountStr || "0", 6);
+    if (amt <= 0n) return alert("Amount must be > 0.");
+
+    const tokenAddr = token === "HKDC" ? ADDR.HKDC : ADDR.SGDC;
+    const erc = new ethers.Contract(tokenAddr, ABI.ERC20, signer);
+
+    const tx = await erc.burn(amt);
+    await tx.wait();
+
+    alert(
+      `Burned ${amountStr} ${token}. (Note: fiat redemption happens off-chain)`
+    );
+    await refreshBasics();
   };
 
   useEffect(() => {
@@ -247,22 +282,62 @@ export default function Home() {
             />
           </div>
 
-          {/* Time + balances */}
+          {/* Time + balances + deposit / withdraw */}
           <div className="rounded-2xl border border-lime-400/20 bg-black/60 p-4">
             <div className="text-sm text-white/70">Current Time</div>
             <div className="mt-2 text-2xl font-bold text-lime-300">
               {new Date(now).toLocaleString()}
             </div>
 
+            {/* Balances */}
             <div className="mt-6 space-y-2">
               <div className="text-sm text-white/70">Balances</div>
+
               <div className="flex justify-between rounded-xl bg-[#0a1118] px-3 py-2">
                 <span>HKDC</span>
                 <span className="text-lime-300">{hkdcBal}</span>
               </div>
+
               <div className="flex justify-between rounded-xl bg-[#0a1118] px-3 py-2">
                 <span>SGDC</span>
                 <span className="text-lime-300">{sgdcBal}</span>
+              </div>
+            </div>
+
+            {/* Deposit / Withdraw buttons with spacing */}
+            <div className="mt-4 space-y-3">
+              {/* HKDC Row */}
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => devMint("HKDC", "10")}
+                  className="rounded-lg border border-lime-400/50 px-3 py-1 hover:bg-lime-400/10 text-xs"
+                >
+                  Deposit HKDC
+                </button>
+
+                <button
+                  onClick={() => userBurn("HKDC", "10")}
+                  className="rounded-lg border border-red-400/60 px-3 py-1 hover:bg-red-400/10 text-xs"
+                >
+                  Withdraw HKDC
+                </button>
+
+                {/* SGDC Row */}
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => devMint("SGDC", "10")}
+                    className="rounded-lg border border-lime-400/50 px-3 py-1 hover:bg-lime-400/10 text-xs"
+                  >
+                    Deposit SGDC
+                  </button>
+                </div>
+
+                <button
+                  onClick={() => userBurn("SGDC", "10")}
+                  className="rounded-lg border border-red-400/60 px-3 py-1 hover:bg-red-400/10 text-xs"
+                >
+                  Withdraw SGDC
+                </button>
               </div>
             </div>
           </div>
