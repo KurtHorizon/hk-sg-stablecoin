@@ -1,25 +1,35 @@
-🚀 Local Deployment Guide (Anvil + Foundry)
+# Local Deployment Guide (Anvil + Foundry)
 
-This section explains how to deploy all stablecoin-related smart contracts (HKDC, SGDC, Oracle, StableFX) to a local Anvil chain using Foundry.
+This guide explains how to deploy all stablecoin-related smart contracts (HKDC, SGDC, Oracle, StableFX) onto a local Anvil blockchain.
 
-1️⃣ Install Dependencies
+## 1 Install Dependencies
+
+```
 cd contract
 forge install OpenZeppelin/openzeppelin-contracts@v5.5.0
+```
 
-2️⃣ Start Local Blockchain (Anvil)
+## 2 Start Local Blockchain (Anvil)
 
-In a separate terminal:
+Open a new terminal tab and run:
 
+```
 anvil
+```
 
-This launches a local chain at:
+Anvil will start at:
 
 RPC URL: http://127.0.0.1:8545
+
 Chain ID: 31337
+
 Default deployer private key:
+
 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
-3️⃣ Deploy HKDC Stablecoin
+## 3 Deploy HKDC Stablecoin
+
+```
 forge create src/StableCoin.sol:StableCoin \
  --rpc-url http://127.0.0.1:8545 \
  --broadcast \
@@ -29,8 +39,11 @@ forge create src/StableCoin.sol:StableCoin \
  "HKDC" \
  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
  '[0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266]'
+```
 
-4️⃣ Deploy SGDC Stablecoin
+## 4 Deploy SGDC Stablecoin
+
+```
 forge create src/StableCoin.sol:StableCoin \
  --rpc-url http://127.0.0.1:8545 \
  --broadcast \
@@ -40,8 +53,13 @@ forge create src/StableCoin.sol:StableCoin \
  "SGDC" \
  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
  '[0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266]'
+```
 
-5️⃣ Deploy Manual Oracle
+## 5 Deploy Manual Oracle
+
+Set the initial HKD/SGD price to 0.173 (× 1e18).
+
+```
 forge create src/ManualOracle.sol:ManualOracle \
  --rpc-url http://127.0.0.1:8545 \
  --broadcast \
@@ -49,13 +67,13 @@ forge create src/ManualOracle.sol:ManualOracle \
  --constructor-args \
  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
  173000000000000000
+```
 
-173000000000000000 corresponds to 0.173 ETH (HKD/SGD rate × 1e18).
+## 6 Deploy StableFX (Swap Engine)
 
-6️⃣ Deploy StableFX
+⚠️ Replace the HKDC, SGDC, and Oracle addresses below with the actual deployment output from steps 3–5.
 
-Replace the last four addresses with the actual deployed addresses from the previous steps.
-
+```
 forge create src/StableFX.sol:StableFX \
  --rpc-url http://127.0.0.1:8545 \
  --broadcast \
@@ -67,17 +85,4 @@ forge create src/StableFX.sol:StableFX \
  0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 \
  20 \
  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-
-Arguments meaning:
-
-Owner
-
-HKDC address
-
-SGDC address
-
-Oracle address
-
-Fee (in basis points)
-
-Compliance admin address
+```
