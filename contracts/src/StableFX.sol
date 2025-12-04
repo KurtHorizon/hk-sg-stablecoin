@@ -97,6 +97,7 @@ contract StableFX is AccessControl, ReentrancyGuard {
         );
 
         (uint256 rateSgdPerHkd, uint256 updatedAt) = oracle.getRate();
+        // require(updatedAt < block.timestamp + x, "stale rate"); // Optional: rate freshness check)
         require(rateSgdPerHkd > 0, "bad rate");
 
         // Calculate output
@@ -110,6 +111,7 @@ contract StableFX is AccessControl, ReentrancyGuard {
 
         // Fee deduction
         fee = (amountOut * feeBps) / BPS_DENOM;
+        uint256 sendOut = amountOut - fee;
 
         // Funds flow:
         // user -> this (tokenIn)
