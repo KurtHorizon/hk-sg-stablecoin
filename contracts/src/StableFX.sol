@@ -44,9 +44,7 @@ contract StableFX is AccessControl, ReentrancyGuard {
     event Rescue(address token, uint256 amount, address to);
 
     constructor(address admin, address hkdc, address sgdc, address oracle_, uint256 feeBps_, address feeTreasury_) {
-        require(admin != address(0) && hkdc != address(0) && sgdc != address(0) && oracle_ != address(0), "zero addr");
         require(feeBps_ < BPS_DENOM, "fee too high");
-        require(feeTreasury_ != address(0), "zero treasury");
 
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(TREASURER_ROLE, admin);
