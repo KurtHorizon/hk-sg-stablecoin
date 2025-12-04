@@ -99,7 +99,7 @@ export default function Home() {
       await tx1.wait();
     }
 
-    const tx2 = await fxw.swapExactIn(tokenIn, tokenOut, amountIn, 0, 6000000);
+    const tx2 = await fxw.swapExactIn(tokenIn, tokenOut, amountIn);
     const rc = await tx2.wait();
 
     await refreshBasics();
