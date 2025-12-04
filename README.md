@@ -11,7 +11,7 @@ forge install OpenZeppelin/openzeppelin-contracts@v5.5.0
 
 ## 2 Start Local Blockchain (Anvil)
 
-Open a new terminal tab and run:
+Open a terminal tab and run:
 
 ```
 anvil
@@ -28,6 +28,16 @@ Default deployer private key:
 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
 ## 3 Deploy HKDC Stablecoin
+
+Open a NEW terminal tab and run:
+
+⚠️ Change directory to "contracts"
+
+```
+cd contracts
+```
+
+Deploy command
 
 ```
 forge create src/StableCoin.sol:StableCoin \
@@ -71,7 +81,7 @@ forge create src/ManualOracle.sol:ManualOracle \
 
 ## 6 Deploy StableFX (Swap Engine)
 
-⚠️ Replace the HKDC, SGDC, and Oracle addresses below with the actual deployment output from steps 3–5.
+⚠️ Replace the HKDC, SGDC, and Oracle addresses below with the actual deployment output from steps 3–5 if they are different from the example.
 
 ```
 forge create src/StableFX.sol:StableFX \
@@ -87,14 +97,27 @@ forge create src/StableFX.sol:StableFX \
  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
 ```
 
-## 7 Mint 1000.0 HKDC to Admin
+## 7 Mint 1000 HKDC to Admin
 
 ```
 cast send 0x5FbDB2315678afecb367f032d93F642f64180aa3 "mint(address,uint256)" 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 1000000000 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --rpc-url http://127.0.0.1:8545
 ```
 
-## 8 Mint 1000.0 SGDC to Admin
+## 8 Mint 1000 SGDC to Admin
 
 ```
 cast send 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 "mint(address,uint256)" 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 1000000000 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --rpc-url http://127.0.0.1:8545
 ```
+
+## 9 Run frontend Next.js
+
+Open a NEW terminal tab and run:
+
+```
+cd frontend
+npm run dev
+```
+
+## 10 Open the website
+
+Open Google Chrome with MetaMask extensions. Paste and goto the URL: http://192.168.32.160:3000

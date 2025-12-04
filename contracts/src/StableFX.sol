@@ -58,17 +58,14 @@ contract StableFX is AccessControl, ReentrancyGuard {
     }
 
     // -------- Management --------
-
     function setFeeParams(uint256 newFeeBps, address newTreasury) external onlyRole(RATE_ADMIN_ROLE) {
         require(newFeeBps < BPS_DENOM, "fee too high");
-        require(newTreasury != address(0), "zero treasury");
         feeBps = newFeeBps;
         feeTreasury = newTreasury;
         emit FeeParamsUpdated(newFeeBps, newTreasury);
     }
 
     function setOracle(address newOracle) external onlyRole(RATE_ADMIN_ROLE) {
-        require(newOracle != address(0), "zero oracle");
         oracle = IManualOracle(newOracle);
         emit OracleUpdated(newOracle);
     }
@@ -86,10 +83,8 @@ contract StableFX is AccessControl, ReentrancyGuard {
      * @param tokenIn   HKDC or SGDC address
      * @param tokenOut  The other token address (must not equal tokenIn)
      * @param amountIn  Amount input by user (18 decimals)
-     * @param minOut    Minimum acceptable output to protect against stale/changed price
-     * @param maxAge    Maximum allowed oracle price age in seconds (e.g., 600)
      */
-    function swapExactIn(address tokenIn, address tokenOut, uint256 amountIn, uint256 minOut, uint256 maxAge)
+    function swapExactIn(address tokenIn, address tokenOut, uint256 amountIn)
         external
         nonReentrant
         returns (uint256 amountOut, uint256 fee)
@@ -103,7 +98,6 @@ contract StableFX is AccessControl, ReentrancyGuard {
 
         (uint256 rateSgdPerHkd, uint256 updatedAt) = oracle.getRate();
         require(rateSgdPerHkd > 0, "bad rate");
-        require(block.timestamp - updatedAt <= maxAge, "stale price");
 
         // Calculate output
         if (tokenIn == address(HKDC)) {
@@ -116,8 +110,6 @@ contract StableFX is AccessControl, ReentrancyGuard {
 
         // Fee deduction
         fee = (amountOut * feeBps) / BPS_DENOM;
-        uint256 sendOut = amountOut - fee;
-        require(sendOut >= minOut, "slippage/minOut");
 
         // Funds flow:
         // user -> this (tokenIn)
